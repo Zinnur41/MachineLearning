@@ -16,6 +16,8 @@ default_color = "black"
 colors = ['red', 'green', 'purple', 'yellow', 'blue']
 
 mouse_held = False
+draw_interval = 90
+draw_counter = 0
 
 running = True
 while running:
@@ -28,8 +30,6 @@ while running:
         elif event.type == pygame.MOUSEBUTTONDOWN:
             if event.button == 1:
                 mouse_held = True
-                points.append(event.pos)
-                points_colors.append(default_color)
 
         elif event.type == pygame.MOUSEBUTTONUP:
             if event.button == 1:
@@ -49,9 +49,11 @@ while running:
 
     if mouse_held:
         pos = pygame.mouse.get_pos()
-        if not points or pos != points[-1]:
-            points.append(pos)
-            points_colors.append(default_color)
+        draw_counter += 1
+        if draw_counter % draw_interval == 0:
+            if not points or pos != points[-1]:
+                points.append(pos)
+                points_colors.append(default_color)
 
     for i, point in enumerate(points):
         pygame.draw.circle(screen, points_colors[i], point, 5)
