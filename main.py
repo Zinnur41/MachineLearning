@@ -10,7 +10,7 @@ hands = mp_hands.Hands(static_image_mode=False, max_num_hands=2, min_detection_c
 
 cap = cv2.VideoCapture(0)
 
-MY_FACE_ID = None  # Запоминаем своё лицо
+MY_FACE_ID = None
 
 def determine_name_fingers(num_fingers):
     if num_fingers == 1:
@@ -37,7 +37,6 @@ while cap.isOpened():
             x, y, w, h = int(bboxC.xmin * iw), int(bboxC.ymin * ih), int(bboxC.width * iw), int(bboxC.height * iw)
             cv2.rectangle(frame, (x, y), (x + w, y + h), (0, 255, 0), 2)
 
-            # Запоминаем своё лицо
             if MY_FACE_ID is None:
                 MY_FACE_ID = (x, y, w, h)
             elif abs(x - MY_FACE_ID[0]) < 50 and abs(y - MY_FACE_ID[1]) < 50:
@@ -54,7 +53,6 @@ while cap.isOpened():
             thumb_tip = landmarks[4]
             thumb_ip = landmarks[2]
 
-            # Проверка большого пальца:
             thumb_up = (thumb_tip.y < thumb_ip.y) and (abs(thumb_tip.x - wrist.x) > 0.05)
 
             fingers_up = [
@@ -67,16 +65,13 @@ while cap.isOpened():
 
             num_fingers = fingers_up.count(True)
 
-            # Рисуем контуры руки
             mp_draw.draw_landmarks(frame, hand_landmarks, mp_hands.HAND_CONNECTIONS)
 
-            # Рисуем поднятые пальцы (зелёные — подняты, красные — опущены)
-            for i, tip in enumerate([4, 8, 12, 16, 20]):  # Кончики пальцев
-                color = (0, 255, 0) if fingers_up[i] else (0, 0, 255)  # Зелёный = поднят, красный = опущен
+            for i, tip in enumerate([4, 8, 12, 16, 20]):
+                color = (0, 255, 0) if fingers_up[i] else (0, 0, 255)
                 cx, cy = int(landmarks[tip].x * iw), int(landmarks[tip].y * ih)
                 cv2.circle(frame, (cx, cy), 10, color, -1)
 
-    # Если моё лицо — сразу ФИО, иначе по количеству пальцев
     if is_my_face and num_fingers == 0:
         name_fingers = "Zinnur Zagidullin"
     else:
